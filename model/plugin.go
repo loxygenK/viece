@@ -1,11 +1,5 @@
 package model
 
-import (
-	"io/ioutil"
-	"strings"
-	"github.com/pelletier/go-toml"
-)
-
 type DeinPlugin struct {
   Frozen int              `toml:"frozen"`
   Local int               `toml:"local"`
@@ -34,28 +28,3 @@ type DeinPluginConfigurationFile struct {
   Filename string
   Configuration DeinPluginConfiguration
 }
-
-func LoadPluginConfig(filename string) (DeinPluginConfigurationFile, error) {
-  rawfile, err := ioutil.ReadFile(filename)
-  if err != nil {
-    return getEmptyConfig(filename), err
-  }
-  escapedfile := strings.Replace(string(rawfile), "\\", "\\\\", -1)
-  file := []byte(escapedfile);
-
-  config := DeinPluginConfiguration{}
-  tomlerr := toml.Unmarshal(file, &config)
-  if tomlerr != nil {
-    return getEmptyConfig(filename), tomlerr
-  }
-  
-  return DeinPluginConfigurationFile{ Filename: filename, Configuration: config }, nil;
-}
-
-func getEmptyConfig(filename string) DeinPluginConfigurationFile {
-  return DeinPluginConfigurationFile{
-    Filename: filename,
-    Configuration: DeinPluginConfiguration{ Plugins: []DeinPlugin{} },
-  }
-}
-
